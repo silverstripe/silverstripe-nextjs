@@ -1,0 +1,9 @@
+---
+Name: silverstripe-nextjs-graphql
+---
+SilverStripe\GraphQL\Schema\Schema:
+  schemas:
+    default:
+      src:
+        - 'silverstripe/silverstripe-nextjs: _graphql'
+

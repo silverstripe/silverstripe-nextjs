@@ -1,0 +1,26 @@
+{
+  "name": "silverstripe/silverstripe-nextjs",
+  "description": "Silverstripe NextJS features",
+  "type": "silverstripe-vendormodule",
+  "license": "MIT",
+  "keywords": [
+    "silverstripe",
+    "headless",
+    "nextjs"
+  ],
+  "authors": [
+    {
+      "name": "Uncle Cheese"
+    }
+  ],
+  "require": {
+    "silverstripe/headless": "dev-main"
+  },
+  "autoload": {
+    "psr-4": {
+      "SilverStripe\\NextJS\\": "src/"
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}

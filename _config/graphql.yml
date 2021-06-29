@@ -6,4 +6,3 @@ SilverStripe\GraphQL\Schema\Schema:
     default:
       src:
         - 'silverstripe/silverstripe-nextjs: _graphql'
-

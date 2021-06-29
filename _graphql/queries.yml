@@ -1,0 +1,18 @@
+staticBuild:
+  type: '[StaticBuildPayload]'
+  description: The list of link/type tuples that should be added to the static build
+templateManifest:
+  args:
+    templates:
+      type: '[String]!'
+      description: A list of templates in the frontend that are available for selection
+  type: '[TemplateResolution]'
+bulkQuery:
+  type: String
+  args:
+    query:
+      type: String!
+      description: The individual query to be run for each URL
+    urls:
+      type: '[String!]!'
+      description: The list of urls to run on the query

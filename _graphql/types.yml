@@ -1,0 +1,8 @@
+StaticBuildPayload:
+  fields:
+    link: String!
+    type: String!
+TemplateResolution:
+  fields:
+    type: String!
+    template: String!

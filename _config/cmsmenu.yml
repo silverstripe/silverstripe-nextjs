@@ -1,0 +1,8 @@
+---
+Name: silverstripe-nextjs-menu
+---
+SilverStripe\Admin\LeftAndMain:
+  menu_groups:
+    Headless:
+      children:
+        - SilverStripe-NextJS-Admins-LinkIndexAdmin

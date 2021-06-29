@@ -14,7 +14,7 @@
     }
   ],
   "require": {
-    "silverstripe/headless": "dev-main"
+    "silverstripe/silverstripe-headless": "dev-main"
   },
   "autoload": {
     "psr-4": {

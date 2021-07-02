@@ -2,6 +2,8 @@ StaticBuildPayload:
   fields:
     link: String!
     type: String!
+  plugins:
+    removeLocale: true
 TemplateResolution:
   fields:
     type: String!

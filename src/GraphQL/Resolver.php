@@ -12,6 +12,7 @@ use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\GraphQL\QueryHandler\SchemaConfigProvider;
 use SilverStripe\GraphQL\Schema\Exception\SchemaBuilderException;
+use TractorCow\Fluent\Extension\FluentSiteTreeExtension;
 
 class Resolver
 {

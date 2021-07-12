@@ -4,15 +4,17 @@
 namespace SilverStripe\NextJS\GraphQL;
 
 
-use GraphQL\Language\AST\OperationDefinitionNode;
-use GraphQL\Language\Parser;
-use GraphQL\Language\Source;
-use GraphQL\Utils\AST;
+use Psr\SimpleCache\CacheInterface;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\ErrorPage\ErrorPage;
 use SilverStripe\GraphQL\QueryHandler\SchemaConfigProvider;
 use SilverStripe\GraphQL\Schema\Exception\SchemaBuilderException;
-use TractorCow\Fluent\Extension\FluentSiteTreeExtension;
+use SilverStripe\GraphQL\Schema\SchemaConfig;
+use SilverStripe\Versioned\Versioned;
+use Psr\SimpleCache\InvalidArgumentException;
+use Exception;
 
 class Resolver
 {
@@ -21,18 +23,34 @@ class Resolver
      * @param array $args
      * @param array $context
      * @return array
-     * @throws SchemaBuilderException
+     * @throws InvalidArgumentException
      */
     public static function resolveStaticBuild($obj, array $args = [], array $context = []): array
     {
+        $cache = self::getCache();
         $result = [];
-        $config = SchemaConfigProvider::get($context);
-        foreach (SiteTree::get() as $page) {
+        $buildID = $args['buildID'];
+
+        if ($cache->has($buildID)) {
+            return $cache->get($buildID);
+        }
+
+        if(class_exists(Versioned::class)) {
+            Versioned::set_stage(Versioned::LIVE);
+        }
+        foreach (SiteTree::get()->limit(999) as $page) {
+            if ($page instanceof ErrorPage) {
+                continue;
+            }
+            if (!$page->URLSegment === 'about-us') {
+                continue;
+            }
             $result[] = [
                 'link' => $page->Link(),
-                'type' => $config->getTypeNameForClass($page->ClassName),
             ];
         }
+
+        $cache->set($buildID, $result);
 
         return $result;
     }
@@ -41,21 +59,66 @@ class Resolver
      * @param $obj
      * @param array $args
      * @param array $context
-     * @return array
+     * @return mixed|null
+     * @throws InvalidArgumentException
+     * @throws Exception
      * @throws SchemaBuilderException
      */
-    public static function resolveTemplateManifest($obj, array $args = [], array $context = []): array
+    public static function resolveTemplatesForLinks($obj, array $args, array $context): ?array
     {
         $templates = $args['templates'];
+        $buildID = $args['buildID'];
         $config = SchemaConfigProvider::get($context);
+        $manifest = self::getTemplateManifest($buildID, $templates, $config);
+        $result = [];
+        foreach ($args['links'] as $link) {
+            $page = SiteTree::get_by_link($link);
+            if (!$page) {
+                throw new Exception(
+                    sprintf('Link %s could not be found', $link)
+                );
+            }
+            $type = $config->getTypeNameForClass($page->ClassName);
+            $template = $manifest[$type] ?? null;
+            if (!$template) {
+                throw new Exception(sprintf(
+                    'No template found for %s',
+                    $link
+                ));
+            }
+            $result[] = [
+                'template' => $template,
+                'link' => $link,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $buildID
+     * @param array $templates
+     * @param SchemaConfig $config
+     * @return array
+     * @throws SchemaBuilderException
+     * @throws InvalidArgumentException
+     */
+    private static function getTemplateManifest(string $buildID, array $templates, SchemaConfig $config): array
+    {
+        /* @var CacheInterface $cache */
+        $cache = Injector::inst()->get(CacheInterface::class . '.nextjs');
+        $cacheKey = md5($buildID . json_encode($templates));
+        if ($cache->has($cacheKey)) {
+            return $cache->get($cacheKey);
+        }
         $typeMapping = $config->get('typeMapping');
         $map = [];
 
         foreach ($typeMapping as $class => $typeName) {
-             $ancestry = array_map(
-                 [ClassInfo::class, 'shortName'],
-                 array_reverse(ClassInfo::ancestry($class))
-             );
+             $ancestry = array_map(function ($ancestor) use ($config) {
+                 return $config->getTypeNameForClass($ancestor);
+             }, array_reverse(ClassInfo::ancestry($class)));
+
              foreach ($ancestry as $candidate) {
                 if (in_array($candidate, $templates)) {
                     $map[$typeName] = $candidate;
@@ -63,16 +126,16 @@ class Resolver
                 }
              }
         }
+        $cache->set($cacheKey, $map);
+        return $map;
+    }
 
-        $result = [];
-        foreach ($map as $type => $template) {
-            $result[] = [
-                'type' => $type,
-                'template' => $template,
-            ];
-        }
-
-        return $result;
+    /**
+     * @return CacheInterface
+     */
+    private static function getCache(): CacheInterface
+    {
+        return Injector::inst()->get(CacheInterface::class . '.nextjs');
     }
 
 }

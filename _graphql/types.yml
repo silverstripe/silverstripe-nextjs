@@ -1,9 +1,19 @@
 StaticBuildPayload:
   fields:
+    typeAncestry: '[TypeAncestry!]!'
+    links:
+      type: '[StaticBuildLink!]!'
+StaticBuildLink:
+  fields:
     link: String!
   plugins:
     removeLocale: true
-TemplateResolution:
+    cleanLinks: true
+TypeAncestry:
   fields:
-    template: String!
+    type: String!
+    ancestry: '[String!]!'
+TypeResolution:
+  fields:
+    type: String!
     link: String!

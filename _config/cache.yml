@@ -1,9 +1,0 @@
----
-Name: nextjs-cache
----
-SilverStripe\Core\Injector\Injector:
-  Psr\SimpleCache\CacheInterface.nextjs:
-    factory: SilverStripe\Core\Cache\CacheFactory
-    constructor:
-      namespace: "nextjs"
-      defaultLifetime: 600

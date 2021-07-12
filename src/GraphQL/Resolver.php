@@ -4,16 +4,13 @@
 namespace SilverStripe\NextJS\GraphQL;
 
 
-use Psr\SimpleCache\CacheInterface;
 use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\Core\ClassInfo;
-use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ErrorPage\ErrorPage;
 use SilverStripe\GraphQL\QueryHandler\SchemaConfigProvider;
+use SilverStripe\GraphQL\Schema\DataObject\InheritanceChain;
 use SilverStripe\GraphQL\Schema\Exception\SchemaBuilderException;
-use SilverStripe\GraphQL\Schema\SchemaConfig;
+use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
-use Psr\SimpleCache\InvalidArgumentException;
 use Exception;
 
 class Resolver
@@ -23,17 +20,35 @@ class Resolver
      * @param array $args
      * @param array $context
      * @return array
-     * @throws InvalidArgumentException
+     * @throws SchemaBuilderException
      */
     public static function resolveStaticBuild($obj, array $args = [], array $context = []): array
     {
-        $cache = self::getCache();
-        $result = [];
-        $buildID = $args['buildID'];
+        $result = [
+            'typeAncestry' => [],
+            'links' => []
+        ];
+        $config = SchemaConfigProvider::get($context);
+        $typeMapping = $config->get('typeMapping');
 
-        if ($cache->has($buildID)) {
-            return $cache->get($buildID);
+        foreach ($typeMapping as $class => $typeName) {
+            $ancestralModels = InheritanceChain::create($class)
+                ->getAncestralModels();
+            $classes = array_filter(
+                $ancestralModels,
+                function ($ancestor) use ($class) {
+                    return !in_array($ancestor, [DataObject::class, $class]);
+                }
+            );
+            $ancestry = array_map(function ($ancestor) use ($config) {
+                return $config->getTypeNameForClass($ancestor);
+            }, array_reverse($classes));
+            $result['typeAncestry'][] = [
+                'type' => $config->getTypeNameForClass($class),
+                'ancestry' => array_reverse($ancestry),
+            ];
         }
+
 
         if(class_exists(Versioned::class)) {
             Versioned::set_stage(Versioned::LIVE);
@@ -45,12 +60,10 @@ class Resolver
             if (!$page->URLSegment === 'about-us') {
                 continue;
             }
-            $result[] = [
-                'link' => $page->Link(),
+            $result['links'][] = [
+                'link' => $page->Link()
             ];
         }
-
-        $cache->set($buildID, $result);
 
         return $result;
     }
@@ -60,18 +73,15 @@ class Resolver
      * @param array $args
      * @param array $context
      * @return mixed|null
-     * @throws InvalidArgumentException
      * @throws Exception
      * @throws SchemaBuilderException
      */
-    public static function resolveTemplatesForLinks($obj, array $args, array $context): ?array
+    public static function resolveTypesForLinks($obj, array $args, array $context): ?array
     {
-        $templates = $args['templates'];
-        $buildID = $args['buildID'];
+        $links = $args['links'];
         $config = SchemaConfigProvider::get($context);
-        $manifest = self::getTemplateManifest($buildID, $templates, $config);
         $result = [];
-        foreach ($args['links'] as $link) {
+        foreach ($links as $link) {
             $page = SiteTree::get_by_link($link);
             if (!$page) {
                 throw new Exception(
@@ -79,63 +89,19 @@ class Resolver
                 );
             }
             $type = $config->getTypeNameForClass($page->ClassName);
-            $template = $manifest[$type] ?? null;
-            if (!$template) {
+            if (!$type) {
                 throw new Exception(sprintf(
-                    'No template found for %s',
-                    $link
+                    'No type found for %s',
+                    $page->ClassName
                 ));
             }
             $result[] = [
-                'template' => $template,
+                'type' => $type,
                 'link' => $link,
             ];
         }
 
         return $result;
-    }
-
-    /**
-     * @param string $buildID
-     * @param array $templates
-     * @param SchemaConfig $config
-     * @return array
-     * @throws SchemaBuilderException
-     * @throws InvalidArgumentException
-     */
-    private static function getTemplateManifest(string $buildID, array $templates, SchemaConfig $config): array
-    {
-        /* @var CacheInterface $cache */
-        $cache = Injector::inst()->get(CacheInterface::class . '.nextjs');
-        $cacheKey = md5($buildID . json_encode($templates));
-        if ($cache->has($cacheKey)) {
-            return $cache->get($cacheKey);
-        }
-        $typeMapping = $config->get('typeMapping');
-        $map = [];
-
-        foreach ($typeMapping as $class => $typeName) {
-             $ancestry = array_map(function ($ancestor) use ($config) {
-                 return $config->getTypeNameForClass($ancestor);
-             }, array_reverse(ClassInfo::ancestry($class)));
-
-             foreach ($ancestry as $candidate) {
-                if (in_array($candidate, $templates)) {
-                    $map[$typeName] = $candidate;
-                    break;
-                }
-             }
-        }
-        $cache->set($cacheKey, $map);
-        return $map;
-    }
-
-    /**
-     * @return CacheInterface
-     */
-    private static function getCache(): CacheInterface
-    {
-        return Injector::inst()->get(CacheInterface::class . '.nextjs');
     }
 
 }

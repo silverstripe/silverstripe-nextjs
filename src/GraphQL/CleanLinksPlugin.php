@@ -11,9 +11,9 @@ use SilverStripe\GraphQL\Schema\Schema;
 use SilverStripe\GraphQL\Schema\Type\Type;
 use TractorCow\Fluent\Model\Locale;
 
-class RemoveLocalePlugin implements TypePlugin
+class CleanLinksPlugin implements TypePlugin
 {
-    const IDENTIFIER = 'removeLocale';
+    const IDENTIFIER = 'cleanLinks';
 
     public function getIdentifier(): string
     {
@@ -33,14 +33,8 @@ class RemoveLocalePlugin implements TypePlugin
      */
     public static function sanitise(string $link): string
     {
-        if (class_exists(Locale::class)) {
-            $locale = Locale::getCurrentLocale();
-            $base = Controller::join_links(Director::baseURL(), $locale->getURLSegment());
-
-            $clean = preg_replace('#^' . preg_quote($base) . '/#', '', $link);
-            return Controller::join_links(Director::baseURL(), $clean);
-        }
-
-        return $link;
+        $clean = preg_replace('#^/|/$#', '', $link);
+        return empty($clean) ? '/' : $clean;
     }
+
 }

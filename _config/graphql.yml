@@ -15,6 +15,7 @@ SilverStripe\Core\Injector\Injector:
   SilverStripe\GraphQL\Schema\Registry\PluginRegistry:
     constructor:
       removeLocale: 'SilverStripe\NextJS\GraphQL\RemoveLocalePlugin'
+      cleanLinks: 'SilverStripe\NextJS\GraphQL\CleanLinksPlugin'
 SilverStripe\GraphQL\Schema\Schema:
   schemas:
     default:
@@ -23,3 +24,4 @@ SilverStripe\GraphQL\Schema\Schema:
           DataObject:
             plugins:
               removeLocale: true
+              cleanLinks: true

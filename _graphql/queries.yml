@@ -1,19 +1,10 @@
 staticBuild:
   args:
-    buildID:
-      type: String!
-      description: The build ID of your NextJS build. See process.env.BUILD_ID
-  type: '[StaticBuildPayload]'
+  type: 'StaticBuildPayload'
   description: The list of link/type tuples that should be added to the static build
-templatesForLinks:
+typesForLinks:
   args:
     links:
       type: '[String!]!'
       description: A list of links to CMS pages
-    templates:
-      type: '[String!]!'
-      description: A list of available template names in your project
-    buildID:
-      type: String!
-      description: The build ID of your NextJS build. See process.env.BUILD_ID
-  type: '[TemplateResolution]'
+  type: '[TypeResolution]'

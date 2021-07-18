@@ -1,10 +1,10 @@
 staticBuild:
   args:
-  type: 'StaticBuildPayload'
+  type: 'StaticBuildPayload!'
   description: The list of link/type tuples that should be added to the static build
 typesForLinks:
   args:
     links:
       type: '[String!]!'
       description: A list of links to CMS pages
-  type: '[TypeResolution]'
+  type: '[TypeResolution!]!'

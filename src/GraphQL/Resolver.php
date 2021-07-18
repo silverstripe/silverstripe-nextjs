@@ -72,11 +72,11 @@ class Resolver
      * @param $obj
      * @param array $args
      * @param array $context
-     * @return mixed|null
+     * @return array
      * @throws Exception
      * @throws SchemaBuilderException
      */
-    public static function resolveTypesForLinks($obj, array $args, array $context): ?array
+    public static function resolveTypesForLinks($obj, array $args, array $context): array
     {
         $links = $args['links'];
         $config = SchemaConfigProvider::get($context);

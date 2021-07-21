@@ -6,9 +6,6 @@ StaticBuildPayload:
 StaticBuildLink:
   fields:
     link: String!
-  plugins:
-    removeLocale: true
-    cleanLinks: true
 TypeAncestry:
   fields:
     type: String!

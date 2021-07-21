@@ -25,3 +25,8 @@ SilverStripe\GraphQL\Schema\Schema:
             plugins:
               removeLocale: true
               cleanLinks: true
+      types:
+        StaticBuildLink:
+          plugins:
+            removeLocale: true
+            cleanLinks: true

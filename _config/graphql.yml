@@ -1,11 +1,27 @@
 ---
 Name: silverstripe-nextjs-graphql
 ---
+SilverStripe\Core\Injector\Injector:
+  SilverStripe\GraphQL\Schema\Registry\PluginRegistry:
+    constructor:
+      cleanLinks: 'SilverStripe\NextJS\GraphQL\CleanLinksPlugin'
 SilverStripe\GraphQL\Schema\Schema:
   schemas:
     default:
       src:
         - 'silverstripe/silverstripe-nextjs: _graphql'
+      config:
+        resolvers:
+          - SilverStripe\Com\GraphQL\Resolver
+        modelConfig:
+          DataObject:
+            plugins:
+              cleanLinks: true
+      types:
+        StaticBuildLink:
+          plugins:
+            cleanLinks: true
+
 ---
 Name: silverstripe-nextjs-fluent
 Only:
@@ -15,7 +31,6 @@ SilverStripe\Core\Injector\Injector:
   SilverStripe\GraphQL\Schema\Registry\PluginRegistry:
     constructor:
       removeLocale: 'SilverStripe\NextJS\GraphQL\RemoveLocalePlugin'
-      cleanLinks: 'SilverStripe\NextJS\GraphQL\CleanLinksPlugin'
 SilverStripe\GraphQL\Schema\Schema:
   schemas:
     default:
@@ -24,9 +39,7 @@ SilverStripe\GraphQL\Schema\Schema:
           DataObject:
             plugins:
               removeLocale: true
-              cleanLinks: true
       types:
         StaticBuildLink:
           plugins:
             removeLocale: true
-            cleanLinks: true

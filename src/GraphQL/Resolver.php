@@ -4,6 +4,7 @@
 namespace SilverStripe\NextJS\GraphQL;
 
 
+use SilverStripe\CMS\Model\RedirectorPage;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ErrorPage\ErrorPage;
 use SilverStripe\GraphQL\QueryHandler\SchemaConfigProvider;
@@ -55,6 +56,9 @@ class Resolver
         }
         foreach (SiteTree::get()->limit(999) as $page) {
             if ($page instanceof ErrorPage) {
+                continue;
+            }
+            if ($page instanceof RedirectorPage) {
                 continue;
             }
             if (!$page->URLSegment === 'about-us') {

@@ -38,8 +38,10 @@ SilverStripe\GraphQL\Schema\Schema:
         modelConfig:
           DataObject:
             plugins:
-              removeLocale: true
+              removeLocale:
+                before: cleanLinks
       types:
         StaticBuildLink:
           plugins:
-            removeLocale: true
+            removeLocale:
+              before: cleanLinks

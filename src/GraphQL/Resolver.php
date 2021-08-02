@@ -6,6 +6,7 @@ namespace SilverStripe\NextJS\GraphQL;
 
 use SilverStripe\CMS\Model\RedirectorPage;
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Control\Director;
 use SilverStripe\ErrorPage\ErrorPage;
 use SilverStripe\GraphQL\QueryHandler\SchemaConfigProvider;
 use SilverStripe\GraphQL\Schema\DataObject\InheritanceChain;
@@ -25,6 +26,7 @@ class Resolver
      */
     public static function resolveStaticBuild($obj, array $args = [], array $context = []): array
     {
+        Director::config()->set('alternate_base_url', '');
         $result = [
             'typeAncestry' => [],
             'links' => []
@@ -61,11 +63,8 @@ class Resolver
             if ($page instanceof RedirectorPage) {
                 continue;
             }
-            if (!$page->URLSegment === 'about-us') {
-                continue;
-            }
             $result['links'][] = [
-                'link' => $page->Link()
+                'link' => $page->getCleanLink(),
             ];
         }
 

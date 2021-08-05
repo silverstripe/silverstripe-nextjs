@@ -33,14 +33,18 @@ class RemoveLocalePlugin implements TypePlugin
      */
     public static function sanitise(string $link): string
     {
-        if (class_exists(Locale::class)) {
-            $locale = Locale::getCurrentLocale();
-            $base = Controller::join_links(Director::baseURL(), $locale->getURLSegment());
-
-            $clean = preg_replace('#^' . preg_quote($base) . '/#', '', $link);
-            return Controller::join_links(Director::baseURL(), $clean);
+        if (!class_exists(Locale::class)) {
+            return $link;
         }
 
-        return $link;
+        if ($link[0] !== '/') {
+            $link = '/' . $link;
+        }
+        if (substr($link, -1) !== '/') {
+            $link = $link . '/';
+        }
+        $locale = Locale::getCurrentLocale();
+        $base = Controller::join_links(Director::baseURL(), $locale->getURLSegment());
+        return preg_replace('#^' . preg_quote($base) . '/#', '', $link);
     }
 }

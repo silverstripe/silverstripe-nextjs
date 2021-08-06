@@ -1,0 +1,7 @@
+---
+Name: nextjs-staticbuild
+---
+SilverStripe\NextJS\Model\StaticBuild:
+  excluded_classes:
+    - SilverStripe\CMS\Model\RedirectorPage
+    - SilverStripe\ErrorPage\ErrorPage

@@ -6,3 +6,4 @@ SilverStripe\Admin\LeftAndMain:
     Headless:
       children:
         - SilverStripe-NextJS-Admins-LinkIndexAdmin
+        - SilverStripe-NextJS-Admins-StaticBuildLeftAndMain

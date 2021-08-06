@@ -4,6 +4,7 @@
 namespace SilverStripe\NextJS\GraphQL;
 
 
+use SilversStripe\NextJS\Model\StaticBuild;
 use SilverStripe\CMS\Model\RedirectorPage;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Director;
@@ -56,15 +57,11 @@ class Resolver
         if(class_exists(Versioned::class)) {
             Versioned::set_stage(Versioned::LIVE);
         }
-        foreach (SiteTree::get()->limit(999) as $page) {
-            if ($page instanceof ErrorPage) {
-                continue;
-            }
-            if ($page instanceof RedirectorPage) {
-                continue;
-            }
+
+        $pages = StaticBuild::currentBuild()->getCollection();
+        foreach ($pages as $page) {
             $result['links'][] = [
-                'link' => $page->getCleanLink(),
+                'link' => $page->CleanLink,
             ];
         }
 

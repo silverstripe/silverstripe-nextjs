@@ -1,9 +1,10 @@
 <?php
 
 
-namespace SilversStripe\NextJS\Model;
+namespace SilverStripe\NextJS\Model;
 
 use SilverStripe\Forms\NumericField;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\Limitable;
 use SilverStripe\Security\Permission;
@@ -104,10 +105,11 @@ class StaticBuildCollector extends DataObject
 
     public function collect(): Limitable
     {
-        throw new BadMethodCallException(sprintf(
-            'Model %s must define a collect() method',
-            static::class
-        ));
+        return ArrayList::create();
+//        throw new BadMethodCallException(sprintf(
+//            'Model %s must define a collect() method',
+//            static::class
+//        ));
     }
 
     public function validate()

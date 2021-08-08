@@ -1,7 +1,7 @@
 <?php
 
 
-namespace SilversStripe\NextJS\Model;
+namespace SilverStripe\NextJS\Model;
 
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;

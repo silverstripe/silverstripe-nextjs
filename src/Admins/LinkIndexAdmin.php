@@ -3,7 +3,7 @@
 
 namespace SilverStripe\NextJS\Admins;
 
-use SilversStripe\NextJS\Model\LinkIndex;
+use SilverStripe\NextJS\Model\LinkIndex;
 use SilverStripe\Admin\ModelAdmin;
 
 class LinkIndexAdmin extends ModelAdmin

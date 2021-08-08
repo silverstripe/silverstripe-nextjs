@@ -4,11 +4,9 @@
 namespace SilverStripe\NextJS\GraphQL;
 
 
-use SilversStripe\NextJS\Model\StaticBuild;
-use SilverStripe\CMS\Model\RedirectorPage;
+use SilverStripe\NextJS\Model\StaticBuild;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Director;
-use SilverStripe\ErrorPage\ErrorPage;
 use SilverStripe\GraphQL\QueryHandler\SchemaConfigProvider;
 use SilverStripe\GraphQL\Schema\DataObject\InheritanceChain;
 use SilverStripe\GraphQL\Schema\Exception\SchemaBuilderException;

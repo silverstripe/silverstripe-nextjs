@@ -2,7 +2,7 @@
 
 namespace SilverStripe\NextJS\Admins;
 
-use SilversStripe\NextJS\Model\StaticBuild;
+use SilverStripe\NextJS\Model\StaticBuild;
 use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Director;

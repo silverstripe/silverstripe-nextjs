@@ -22,6 +22,7 @@ use SilverStripe\Security\Permission;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\TabSet;
 use SilverStripe\Security\PermissionProvider;
+use SilverStripe\Versioned\VersionedGridFieldState\VersionedGridFieldState;
 use SilverStripe\View\ArrayData;
 use Symbiote\GridFieldExtensions\GridFieldAddNewMultiClass;
 use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
@@ -107,6 +108,7 @@ class StaticBuild extends DataObject implements PermissionProvider
                     'Link' => 'URL',
                     'Source' => 'Source',
                 ]);
+            $gridField->getConfig()->removeComponentsByType(VersionedGridFieldState::class);
         }
         $this->extend('updateCMSFields', $fields);
 

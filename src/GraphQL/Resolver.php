@@ -4,15 +4,19 @@
 namespace SilverStripe\NextJS\GraphQL;
 
 
+use GraphQL\Type\Definition\ResolveInfo;
+use SilverStripe\Core\ClassInfo;
 use SilverStripe\NextJS\Model\StaticBuild;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Director;
 use SilverStripe\GraphQL\QueryHandler\SchemaConfigProvider;
 use SilverStripe\GraphQL\Schema\DataObject\InheritanceChain;
 use SilverStripe\GraphQL\Schema\Exception\SchemaBuilderException;
+use SilverStripe\NextJS\Services\FragmentBuilder;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
 use Exception;
+use ReflectionException;
 
 class Resolver
 {
@@ -96,6 +100,55 @@ class Resolver
             $result[] = [
                 'type' => $type,
                 'link' => $link,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param $obj
+     * @param array $args
+     * @param array $context
+     * @param ResolveInfo $info
+     * @return array
+     * @throws SchemaBuilderException
+     * @throws ReflectionException
+     */
+    public static function resolveGenerateFragments($obj, array $args, array $context, ResolveInfo $info): array
+    {
+        $baseClass = $args['baseClass'];
+        $includeBase = $args['includeBase'] ?? true;
+        $baseFields = $args['baseFields'] ?? [];
+
+        $result = [];
+
+        if (!is_subclass_of($baseClass, DataObject::class)) {
+            throw new Exception(sprintf(
+                'Class %s is not a subclass of %s',
+                $baseClass,
+                DataObject::class
+            ));
+        }
+
+        $config = SchemaConfigProvider::get($context);
+        $subclasses = ClassInfo::subclassesFor($baseClass, $includeBase);
+        $builder = FragmentBuilder::create($info->schema, $config, $baseFields);
+        foreach ($subclasses as $class) {
+            $type = $config->getTypeNameForClass($class);
+            if (!$type) {
+                continue;
+            }
+            try {
+                // If the type isn't exposed, then it shouldn't be included.
+                $info->schema->getType($type);
+            } catch (Exception $e) {
+                continue;
+            }
+            $fragment = $builder->getFragmentForClass($class);
+            $result[] = [
+                'type' => $type,
+                'fragment' => $fragment,
             ];
         }
 

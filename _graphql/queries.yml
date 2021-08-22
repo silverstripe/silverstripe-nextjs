@@ -1,5 +1,4 @@
 staticBuild:
-  args:
   type: 'StaticBuildPayload!'
   description: The list of link/type tuples that should be added to the static build
 typesForLinks:
@@ -8,3 +7,9 @@ typesForLinks:
       type: '[String!]!'
       description: A list of links to CMS pages
   type: '[TypeResolution!]!'
+generateFragments:
+  args:
+    baseClass: String!
+    includeBase: Boolean
+    baseFields: '[String!]'
+  type: '[GeneratedFragment!]!'

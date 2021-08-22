@@ -14,3 +14,7 @@ TypeResolution:
   fields:
     type: String!
     link: String!
+GeneratedFragment:
+  fields:
+    type: String!
+    fragment: String

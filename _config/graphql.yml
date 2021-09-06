@@ -1,22 +1,9 @@
 
 ---
-Name: silverstripe-nextjs-fluent
-Only:
-  moduleexists: 'tractorcow/silverstripe-fluent'
+Name: silverstripe-nextjs-graphql
 ---
-SilverStripe\Core\Injector\Injector:
-  SilverStripe\GraphQL\Schema\Registry\PluginRegistry:
-    constructor:
-      removeLocale: 'SilverStripe\NextJS\GraphQL\RemoveLocalePlugin'
 SilverStripe\GraphQL\Schema\Schema:
   schemas:
     default:
-      config:
-        modelConfig:
-          DataObject:
-            plugins:
-              removeLocale: true
-      types:
-        StaticBuildLink:
-          plugins:
-            removeLocale: true
+      src:
+        - 'silverstripe/silverstripe-nextjs: _graphql'

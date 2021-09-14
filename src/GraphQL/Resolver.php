@@ -120,6 +120,7 @@ class Resolver
         $baseClass = $args['baseClass'];
         $includeBase = $args['includeBase'] ?? true;
         $baseFields = $args['baseFields'] ?? [];
+        $maxNesting = $args['maxNesting'];
 
         $result = [];
 
@@ -134,6 +135,7 @@ class Resolver
         $config = SchemaConfigProvider::get($context);
         $subclasses = ClassInfo::subclassesFor($baseClass, $includeBase);
         $builder = FragmentBuilder::create($info->schema, $config, $baseFields);
+        $builder->setMaxNesting($maxNesting);
         foreach ($subclasses as $class) {
             $type = $config->getTypeNameForClass($class);
             if (!$type) {

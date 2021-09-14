@@ -12,4 +12,7 @@ generateFragments:
     baseClass: String!
     includeBase: Boolean
     baseFields: '[String!]'
+    maxNesting:
+      type: 'Int!'
+      defaultValue: 2
   type: '[GeneratedFragment!]!'

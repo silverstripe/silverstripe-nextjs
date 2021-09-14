@@ -7,6 +7,7 @@ namespace SilverStripe\NextJS\Services;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\TypeWithFields;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\GraphQL\Schema\DataObject\InterfaceBuilder;
 use SilverStripe\GraphQL\Schema\Exception\SchemaBuilderException;
@@ -32,6 +33,11 @@ class FragmentBuilder
      * @var string[]
      */
     private $baseFields;
+
+    /**
+     * @var int
+     */
+    private $maxNesting = 2;
 
     /**
      * FragmentBuilder constructor.
@@ -84,14 +90,17 @@ class FragmentBuilder
     }
 
     /**
-     * @param ObjectType $type
-     * @param string | null $parentName
+     * @param TypeWithFields $type
+     * @param int $level
      * @return array|string[]
      * @throws SchemaBuilderException
      */
-    private function getFieldsForType(ObjectType $type, ?string $parentName = null): array
+    private function getFieldsForType(TypeWithFields $type, int $level = 1): array
     {
-        $interfaceName = InterfaceBuilder::interfaceName($type->name, $this->getConfig());
+        $interfaceName = $type instanceof InterfaceType
+            ? $type->name
+            : InterfaceBuilder::interfaceName($type->name, $this->getConfig());
+
         $leafInterfaceName = null;
         try {
             $interface = $this->getSchema()->getType($interfaceName);
@@ -125,37 +134,46 @@ class FragmentBuilder
             if (in_array($field->name, $ignoreFields)) {
                     continue;
             }
-            $type = Type::getNamedType($field->getType());
+            $nestedTypeObj = Type::getNamedType($field->getType());
 
-            if (Type::isBuiltInType($type)) {
+            if (Type::isBuiltInType($nestedTypeObj)) {
                 $result[$field->name] = true;
                 continue;
-            }
-
-            try {
-                $typeObj = $this->getSchema()->getType($type->name);
-                if (!$typeObj instanceof ObjectType) {
-                    continue;
-                }
-            } catch (Exception $e) {
-                continue;
-            }
-
-            // Block recursion
-            if ($typeObj === $type) {
-                continue;
-            }
-
-            $fields = $typeObj->getFields();
-            if (isset($fields['edges']) && isset($fields['nodes'])) {
-                $nodeType = Type::getNamedType($fields['nodes']->getType());
-                if (!$nodeType instanceof ObjectType || $nodeType === $type) {
-                    continue;
-                }
-                $result[$field->name]['nodes'] = $this->getFieldsForType($nodeType, $field->name);
             } else {
-                $result[$field->name] = $this->getFieldsForType($typeObj, $field->name);
+                $result[$field->name] = [
+                    '__typename ## add your fields below' => true
+                ];
+                continue;
             }
+
+//            try {
+//                if (!$nestedTypeObj instanceof TypeWithFields) {
+//                    continue;
+//                }
+//            } catch (Exception $e) {
+//                continue;
+//            }
+//
+//            // Block recursion
+//            if ($level === $this->getMaxNesting()) {
+//                continue;
+//            }
+//            $nestedFields = $nestedTypeObj->getFields();
+//            if (isset($nestedFields['edges']) && isset($nestedFields['nodes'])) {
+//                $nodeType = Type::getNamedType($nestedFields['nodes']->getType());
+//                if (!$nodeType instanceof TypeWithFields || $nodeType === $type) {
+//                    continue;
+//                }
+//                $nodeFields = $this->getFieldsForType($nodeType, $level + 1);
+//                if (!empty($nodeFields)) {
+//                    $result[$field->name]['nodes'] = $nodeFields;
+//                }
+//            } else {
+//                $nodeFields = $this->getFieldsForType($nestedTypeObj, $level + 1);
+//                if (!empty($nodeFields)) {
+//                    $result[$field->name] = $nodeFields;
+//                }
+//            }
         }
 
         return $result;
@@ -178,6 +196,23 @@ class FragmentBuilder
     }
 
     /**
+     * @return int
+     */
+    public function getMaxNesting(): int
+    {
+        return $this->maxNesting;
+    }
+
+    /**
+     * @param int $maxNesting
+     */
+    public function setMaxNesting(int $maxNesting): void
+    {
+        $this->maxNesting = $maxNesting;
+    }
+
+
+    /**
      * @param array $fields
      * @param int $level
      * @return string
@@ -191,7 +226,9 @@ class FragmentBuilder
                 $result .= sprintf('%s%s%s', $tabs, $field, "\n");
                 continue;
             }
-
+            if (empty($branch)) {
+                continue;
+            }
             $result .= sprintf(
                 '%s%s { %s %s%s}%s',
                 $tabs,

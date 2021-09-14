@@ -4,6 +4,7 @@
 namespace SilverStripe\NextJS\Services;
 
 
+use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
@@ -132,19 +133,25 @@ class FragmentBuilder
 
         foreach ($type->getFields() as $field) {
             if (in_array($field->name, $ignoreFields)) {
-                    continue;
+                continue;
             }
             $nestedTypeObj = Type::getNamedType($field->getType());
 
             if (Type::isBuiltInType($nestedTypeObj)) {
                 $result[$field->name] = true;
                 continue;
-            } else {
+            }
+            if($nestedTypeObj instanceof TypeWithFields) {
                 $result[$field->name] = [
                     '__typename ## add your fields below' => true
                 ];
                 continue;
             }
+            if ($nestedTypeObj instanceof EnumType) {
+                $result[$field->name] = true;
+                continue;
+            }
+
 
 //            try {
 //                if (!$nestedTypeObj instanceof TypeWithFields) {

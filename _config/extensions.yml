@@ -1,0 +1,6 @@
+---
+Name: nextjs-extensions
+---
+SilverStripe\CMS\Model\SiteTree:
+  extensions:
+    - SilverStripe\NextJS\Extensions\SiteTreeExtension

@@ -1,0 +1,8 @@
+---
+Name: nextjs-configuration
+---
+SilverStripe\Core\Injector\Injector:
+  SilverStripe\NextJS\Services\Configuration:
+    properties:
+      BaseURL: '`NEXTJS_BASE_URL`'
+      PreviewKey: '`NEXTJS_PREVIEW_KEY`'

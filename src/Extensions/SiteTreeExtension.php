@@ -27,7 +27,7 @@ class SiteTreeExtension extends DataExtension
         }
 
         $factory = PreviewTokenFactory::create($previewKey);
-        return $config->getPreviewLink(
+        $link = $config->getPreviewLink(
             $factory->createToken($this->owner),
             $relative
         );
@@ -44,7 +44,7 @@ class SiteTreeExtension extends DataExtension
         }
 
         return sprintf(
-            '%s/%s',
+            '%s%s',
             $baseURL,
             $this->owner->Link()
         );

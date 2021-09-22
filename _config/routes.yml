@@ -1,0 +1,6 @@
+---
+Name: nextjs-routes
+---
+SilverStripe\Control\Director:
+  rules:
+    'nextjs-preview': '%$SilverStripe\NextJS\Controllers\PreviewController'

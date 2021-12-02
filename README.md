@@ -9,12 +9,12 @@ the related [Silverstripe/NextJS starter kit](https://github.com/silverstripe/si
 * Configure a static build (i.e. the subset of pages to statically generate on build)
 
 * Provides token-based content previews (full implementation provided
-by the starter kit)
+by the [Silverstripe/NextJS starter kit](https://github.com/silverstripe/silverstripe-nextjs-starter))
 
 * **Fluent only**: remove the locale from the URL, leaving NextJS to handle
 this natively
 
-* Several custom queries and fields required for the Silverstripe/NextJS starter kit](https://github.com/silverstripe/silverstripe-nextjs-starter) internals.
+* Several custom queries and fields required for the [Silverstripe/NextJS starter kit](https://github.com/silverstripe/silverstripe-nextjs-starter) internals.
 
 ### Static build configuration
 

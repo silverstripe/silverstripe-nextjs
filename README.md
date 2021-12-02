@@ -19,7 +19,7 @@ this natively
 ### Static build configuration
 
 
-Many headless frameworks will do full or partial static builds as part of deployment. This module allows you to design a strategy for what should be included in that static build.
+NextJS supports [Incremental Static Regeneration (ISR)](https://vercel.com/docs/concepts/next.js/incremental-static-regeneration), which is statically publishing just a subset of all the pages on the site, and leaving the rest to generate on-demand at request time. This module allows you to design a strategy for what should be included in that initial static build.
 
 <img src="https://raw.githubusercontent.com/silverstripe/silverstripe-nextjs/main/screenshots/static_build.png" />
 

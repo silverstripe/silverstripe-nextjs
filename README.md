@@ -21,7 +21,7 @@ this natively
 
 Many headless frameworks will do full or partial static builds as part of deployment. This module allows you to design a strategy for what should be included in that static build.
 
-<img src="https://raw.githubusercontent.com/silverstripe/silverstripe-nextjs/main/screeenshots/static_build.png" />
+<img src="https://raw.githubusercontent.com/silverstripe/silverstripe-nextjs/main/screenshots/static_build.png" />
 
 
 #### Limiting the static build
